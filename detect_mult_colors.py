@@ -3,37 +3,49 @@ import cv2
 import sys
 import os
 
+"""
+detect_multi_colors.py
+
+Developed to detect tokens used in pick/place operation with a dobot Magician robotic arm
+This program detects Red, Blue, Yellow, and Green tokens and creates a bounding box around them in order to
+sort with the dobot Magician
+
+Developed by Zack Bowen with assistance from Quinn Geist and Zheng Zeng
+Robotic Arm with Vision System, Penn State Behrend ECE
+"""
+
+
 # Colors in HSV
 # Hue - Pure Color - 8 bits 0-180, find Hue value and divide by 2 to get values on scale
 # Saturation - Purity/Intensity - 0-255
 # Value - Relative Lightness or darkness - 0-255
 
-
 # Red
-lowerRed = np.array([160, 150, 0], dtype="uint8")
+lowerRed = np.array([160, 0, 0], dtype="uint8")
 upperRed = np.array([180, 255, 255], dtype="uint8")
 
 # Blue
-lowerBlue = np.array([100, 150, 0], dtype="uint8")
+lowerBlue = np.array([100, 0, 0], dtype="uint8")
 upperBlue = np.array([125, 255, 255], dtype="uint8")
 
 # Yellow
-lowerYellow = np.array([12, 150, 100], dtype="uint8")
-upperYellow = np.array([35, 255, 255], dtype="uint8")
+lowerYellow = np.array([25, 0, 0], dtype="uint8")
+upperYellow = np.array([40, 255, 255], dtype="uint8")
 
 # Green
-lowerGreen = np.array([36, 150, 0], dtype="uint8")
-upperGreen = np.array([86, 255, 255], dtype="uint8")
+lowerGreen = np.array([45, 0, 0], dtype="uint8")
+upperGreen = np.array([80, 255, 255], dtype="uint8")
 
 
 def colorDetectionHSV():
+    """
+    Function used to detect live video images in HSV format
+    """
     cap = cv2.VideoCapture(1)
     while True:
         for _ in range(100):
-
             ret, image = cap.read()
-
-
+            image = zoom(image, 1, 1)
             image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
             # find the colors within the specified boundaries and apply the mask
@@ -55,7 +67,13 @@ def colorDetectionHSV():
             row1 = np.concatenate((outputR, outputB), axis=1)
             row2 = np.concatenate((outputY, outputG), axis=1)
             imageStack = np.concatenate((row1, row2), axis=0)
-            cv2.imshow("images", imageStack)
+            # cv2.imshow("images", imageStack)
+
+            drawBoundingBox(outputR)
+            # drawBoundingBox(outputB)
+            # drawBoundingBox(outputY)
+            # drawBoundingBox(outputG)
+            # drawBoundingBox(imageStack)
 
             # Press q to quit
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -63,16 +81,15 @@ def colorDetectionHSV():
 
 
 def cyclePictures():
+    """
+    Function used for testing purposes
+    Displays all images in test_pics folder
+    """
     for filename in os.listdir("test_pics"):
         for _ in range(100):
 
             image = cv2.imread(os.path.join("test_pics", filename))
             image = cv2.resize(image, (300,300), interpolation=cv2.INTER_LINEAR)
-
-            # Colors in HSV
-            # Hue - Pure Color - 8 bits 0-180, find Hue value and divide by 2 to get values on scale
-            # Saturation - Purity/Intensity - 0-255
-            # Value - Relative Lightness or darkness - 0-255
             image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
             # find the colors within the specified boundaries and apply the mask
@@ -102,14 +119,12 @@ def cyclePictures():
 
 
 def viewPicture(filename):
-    #ret, image = cap.read()
+    """
+    Used in testing to view pictures saved on local machine
+    Input: filename - name of file to view
+    """
     image = cv2.imread(os.path.join("test_pics", filename))
-    image = cv2.resize(image, (300,300), interpolation=cv2.INTER_LINEAR)
-
-    # Colors in HSV
-    # Hue - Pure Color - 8 bits 0-180, find Hue value and divide by 2 to get values on scale
-    # Saturation - Purity/Intensity - 0-255
-    # Value - Relative Lightness or darkness - 0-255
+    image = zoom(image, 2, 1)
     image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # find the colors within the specified boundaries and apply the mask
@@ -127,24 +142,91 @@ def viewPicture(filename):
     outputY = cv2.bitwise_and(image, image, mask=maskY)
     outputG = cv2.bitwise_and(image, image, mask=maskG)
 
+    outputImages = [outputR, outputB, outputY, outputG]
+
     # shows both images
     row1 = np.concatenate((outputR, outputB, image), axis=1)
     row2 = np.concatenate((outputY, outputG, image), axis=1)
     imageStack = np.concatenate((row1, row2), axis=0)
-    cv2.imshow("images", imageStack)
-    cv2.waitKey(0);
+    imageStack = cv2.resize(imageStack, (1500, 900), interpolation=cv2.INTER_LINEAR)
+
+    drawBoundingBox(outputR)
+    drawBoundingBox(outputB)
+    drawBoundingBox(outputY)
+    drawBoundingBox(outputG)
+
+    #cv2.imshow("images", imageStack)
+    #cv2.waitKey(0)
 
     # Press q to quit
     if cv2.waitKey(1) & 0xFF == ord('q'):
         sys.exit(1)
 
+
+def drawBoundingBox(img):
+    """
+    Creates a bounding box around the given image
+    Input: img - Image opened in CV2
+    Returns the position of the bounding box as a tuple of x,y,w,h
+    """
+
+    # convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    smoothed = cv2.GaussianBlur(gray, (0, 0), sigmaX=10, sigmaY=10, borderType=cv2.BORDER_DEFAULT)
+    cv2.imshow("Smoothed", smoothed)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+
+    # threshold
+    thresh = cv2.threshold(smoothed, 128, 255, cv2.THRESH_BINARY)[1]
+    cv2.imshow("Threshold", thresh)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+
+    # finds all contours and appends them to array contours
+    result = img.copy()
+    contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours[0] if len(contours) == 2 else contours[1]
+    if contours:
+        x, y, w, h = cv2.boundingRect(contours[0])
+        cv2.rectangle(result, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        print("x,y,w,h:", x, y, w, h)
+
+    # show thresh and result
+    cv2.imshow("bounding_box", result)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+
+
+def zoom(img, hZoom, wZoom):
+    """
+    Provides the functionality to zoom in on an image, this can zoom in so taht only the blocks on the conveyor are
+    visible
+    Input: img - image to zoom
+    Input: hZoom - how much height to zoom
+    Input: wZoom - how much width to zoom
+    """
+    h, w, c = img.shape
+
+    center = (h / 2, w / 2)
+    new_h = center[0] / hZoom
+    new_w = center[1] / wZoom
+
+    return img[int(center[0]-new_h):int(center[0]+new_h), int(center[1]-new_w):int(center[1]+new_w)]
+
+
 def main():
     colorDetectionHSV()
-    # viewPicture("dobot_11.jpg")
+    # blobDetection()
+    # viewPicture("dobot_1.jpg")
+    # zoom(cv2.imread(os.path.join("test_pics", "dobot_1.jpg")), 2, 2)
 
 
 if __name__ == "__main__":
     sys.exit(main())
 
 
-
+# Ideas to get correct bounding box:
+    # Remove glare (yellow blends with white)
+    # Zoom image to just the conveyor
