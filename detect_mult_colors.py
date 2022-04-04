@@ -186,7 +186,7 @@ def drawBoundingBox(img):
     # convolved and third parameter is the number
     # of iterations, which will determine how much
     # you want to erode/dilate a given image.
-    gray = cv2.erode(gray, kernel, iterations=3)
+    gray = cv2.erode(gray, kernel, iterations=5)
     #  _____________________________________________________________________
 
 
