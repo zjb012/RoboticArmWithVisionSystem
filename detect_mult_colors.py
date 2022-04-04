@@ -124,7 +124,7 @@ def viewPicture(filename):
     Input: filename - name of file to view
     """
     image = cv2.imread(os.path.join("test_pics", filename))
-    image = zoom(image, 2, 1)
+    image = zoom(image, 1, 1)
     image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # find the colors within the specified boundaries and apply the mask
@@ -141,6 +141,7 @@ def viewPicture(filename):
     outputB = cv2.bitwise_and(image, image, mask=maskB)
     outputY = cv2.bitwise_and(image, image, mask=maskY)
     outputG = cv2.bitwise_and(image, image, mask=maskG)
+    cv2.imwrite("outputR.jpg", outputR)
 
     outputImages = [outputR, outputB, outputY, outputG]
 
@@ -150,13 +151,13 @@ def viewPicture(filename):
     imageStack = np.concatenate((row1, row2), axis=0)
     imageStack = cv2.resize(imageStack, (1500, 900), interpolation=cv2.INTER_LINEAR)
 
-    drawBoundingBox(outputR)
-    drawBoundingBox(outputB)
+    #drawBoundingBox(outputR)
+    #drawBoundingBox(outputB)
     drawBoundingBox(outputY)
-    drawBoundingBox(outputG)
+    #drawBoundingBox(outputG)
 
     #cv2.imshow("images", imageStack)
-    #cv2.waitKey(0)
+    cv2.waitKey(0)
 
     # Press q to quit
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -170,19 +171,38 @@ def drawBoundingBox(img):
     Returns the position of the bounding box as a tuple of x,y,w,h
     """
 
+
     # convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #cv2.imwrite("gray.jpg", gray)
+
+    #  _____________________________________________________________________
+    # Eventually want to update based on what the image looks like (change number of iterations)
+    # Taking a matrix of size 5 as the kernel
+    kernel = np.ones((5, 5), np.uint8)
+
+    # The first parameter is the original image,
+    # kernel is the matrix with which image is
+    # convolved and third parameter is the number
+    # of iterations, which will determine how much
+    # you want to erode/dilate a given image.
+    gray = cv2.erode(gray, kernel, iterations=3)
+    #  _____________________________________________________________________
+
 
     smoothed = cv2.GaussianBlur(gray, (0, 0), sigmaX=10, sigmaY=10, borderType=cv2.BORDER_DEFAULT)
     cv2.imshow("Smoothed", smoothed)
+    #cv2.imwrite("smoothed.jpg", smoothed)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
 
     # threshold
     thresh = cv2.threshold(smoothed, 128, 255, cv2.THRESH_BINARY)[1]
     cv2.imshow("Threshold", thresh)
+    #cv2.imwrite("thresh.jpg", thresh)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
+
 
     # finds all contours and appends them to array contours
     result = img.copy()
@@ -195,8 +215,8 @@ def drawBoundingBox(img):
 
     # show thresh and result
     cv2.imshow("bounding_box", result)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 def zoom(img, hZoom, wZoom):
@@ -217,10 +237,10 @@ def zoom(img, hZoom, wZoom):
 
 
 def main():
-    colorDetectionHSV()
+    # colorDetectionHSV()
     # blobDetection()
-    # viewPicture("dobot_1.jpg")
-    # zoom(cv2.imread(os.path.join("test_pics", "dobot_1.jpg")), 2, 2)
+    viewPicture("dobot_1.jpg")
+    # zoom(cv2.imread(os.path.join("test_pics", "dobot_1.jpg")), 2, 1)
 
 
 if __name__ == "__main__":
