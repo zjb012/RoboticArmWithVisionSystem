@@ -151,10 +151,10 @@ def viewPicture(filename):
     imageStack = np.concatenate((row1, row2), axis=0)
     imageStack = cv2.resize(imageStack, (1500, 900), interpolation=cv2.INTER_LINEAR)
 
-    #drawBoundingBox(outputR)
-    #drawBoundingBox(outputB)
+    drawBoundingBox(outputR)
+    drawBoundingBox(outputB)
     drawBoundingBox(outputY)
-    #drawBoundingBox(outputG)
+    drawBoundingBox(outputG)
 
     #cv2.imshow("images", imageStack)
     cv2.waitKey(0)
@@ -221,7 +221,7 @@ def drawBoundingBox(img):
 
 def zoom(img, hZoom, wZoom):
     """
-    Provides the functionality to zoom in on an image, this can zoom in so taht only the blocks on the conveyor are
+    Provides the functionality to zoom in on an image, this can zoom in so that only the blocks on the conveyor are
     visible
     Input: img - image to zoom
     Input: hZoom - how much height to zoom
@@ -239,7 +239,7 @@ def zoom(img, hZoom, wZoom):
 def main():
     # colorDetectionHSV()
     # blobDetection()
-    viewPicture("dobot_1.jpg")
+    viewPicture("dobot_9.jpg")
     # zoom(cv2.imread(os.path.join("test_pics", "dobot_1.jpg")), 2, 1)
 
 
