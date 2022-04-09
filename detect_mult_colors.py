@@ -25,7 +25,7 @@ lowerRed = np.array([160, 0, 0], dtype="uint8")
 upperRed = np.array([180, 255, 255], dtype="uint8")
 
 # Blue
-lowerBlue = np.array([100, 0, 0], dtype="uint8")
+lowerBlue = np.array([100, 100, 100], dtype="uint8")
 upperBlue = np.array([125, 255, 255], dtype="uint8")
 
 # Yellow
@@ -33,7 +33,7 @@ lowerYellow = np.array([25, 0, 0], dtype="uint8")
 upperYellow = np.array([40, 255, 255], dtype="uint8")
 
 # Green
-lowerGreen = np.array([45, 0, 0], dtype="uint8")
+lowerGreen = np.array([45, 125, 125], dtype="uint8")
 upperGreen = np.array([80, 255, 255], dtype="uint8")
 
 
@@ -69,10 +69,10 @@ def colorDetectionHSV():
             imageStack = np.concatenate((row1, row2), axis=0)
             # cv2.imshow("images", imageStack)
 
-            drawBoundingBox(outputR)
-            # drawBoundingBox(outputB)
-            # drawBoundingBox(outputY)
-            # drawBoundingBox(outputG)
+            #drawBoundingBox(outputR)
+            drawBoundingBox(outputB)
+            #drawBoundingBox(outputY)
+            #drawBoundingBox(outputG)
             # drawBoundingBox(imageStack)
 
             # Press q to quit
@@ -151,10 +151,10 @@ def viewPicture(filename):
     imageStack = np.concatenate((row1, row2), axis=0)
     imageStack = cv2.resize(imageStack, (1500, 900), interpolation=cv2.INTER_LINEAR)
 
-    drawBoundingBox(outputR)
+    #drawBoundingBox(outputR)
     drawBoundingBox(outputB)
-    drawBoundingBox(outputY)
-    drawBoundingBox(outputG)
+    #drawBoundingBox(outputY)
+    #drawBoundingBox(outputG)
 
     #cv2.imshow("images", imageStack)
     cv2.waitKey(0)
@@ -179,26 +179,26 @@ def drawBoundingBox(img):
     #  _____________________________________________________________________
     # Eventually want to update based on what the image looks like (change number of iterations)
     # Taking a matrix of size 5 as the kernel
-    kernel = np.ones((5, 5), np.uint8)
+    # kernel = np.ones((5, 5), np.uint8)
 
     # The first parameter is the original image,
     # kernel is the matrix with which image is
     # convolved and third parameter is the number
     # of iterations, which will determine how much
     # you want to erode/dilate a given image.
-    gray = cv2.erode(gray, kernel, iterations=5)
+    # gray = cv2.erode(gray, kernel, iterations=5)
     #  _____________________________________________________________________
 
 
     smoothed = cv2.GaussianBlur(gray, (0, 0), sigmaX=10, sigmaY=10, borderType=cv2.BORDER_DEFAULT)
-    cv2.imshow("Smoothed", smoothed)
+    #cv2.imshow("Smoothed", smoothed)
     #cv2.imwrite("smoothed.jpg", smoothed)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
 
     # threshold
     thresh = cv2.threshold(smoothed, 128, 255, cv2.THRESH_BINARY)[1]
-    cv2.imshow("Threshold", thresh)
+    #cv2.imshow("Threshold", thresh)
     #cv2.imwrite("thresh.jpg", thresh)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
@@ -215,8 +215,8 @@ def drawBoundingBox(img):
 
     # show thresh and result
     cv2.imshow("bounding_box", result)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.waitKey(1)
+    #cv2.destroyAllWindows()
 
 
 def zoom(img, hZoom, wZoom):
@@ -237,9 +237,9 @@ def zoom(img, hZoom, wZoom):
 
 
 def main():
-    # colorDetectionHSV()
+    colorDetectionHSV()
     # blobDetection()
-    viewPicture("dobot_9.jpg")
+    # viewPicture("dobot_9.jpg")
     # zoom(cv2.imread(os.path.join("test_pics", "dobot_1.jpg")), 2, 1)
 
 
