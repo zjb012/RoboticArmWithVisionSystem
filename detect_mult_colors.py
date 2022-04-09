@@ -25,7 +25,7 @@ lowerRed = np.array([160, 0, 0], dtype="uint8")
 upperRed = np.array([180, 255, 255], dtype="uint8")
 
 # Blue
-lowerBlue = np.array([100, 100, 100], dtype="uint8")
+lowerBlue = np.array([100, 100, 0], dtype="uint8")
 upperBlue = np.array([125, 255, 255], dtype="uint8")
 
 # Yellow
@@ -46,6 +46,7 @@ def colorDetectionHSV():
         for _ in range(100):
             ret, image = cap.read()
             image = zoom(image, 1, 1)
+
             image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
             # find the colors within the specified boundaries and apply the mask
@@ -73,8 +74,9 @@ def colorDetectionHSV():
             drawBoundingBox(outputB)
             #drawBoundingBox(outputY)
             #drawBoundingBox(outputG)
-            # drawBoundingBox(imageStack)
 
+            #drawBoundingBox(imageStack)
+            #sys.exit(1)
             # Press q to quit
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 sys.exit(1)
@@ -214,8 +216,10 @@ def drawBoundingBox(img):
         print("x,y,w,h:", x, y, w, h)
 
     # show thresh and result
-    cv2.imshow("bounding_box", result)
+    cv2.imshow("bounding_box", thresh)
     cv2.waitKey(1)
+    cv2.waitKey(100)
+
     #cv2.destroyAllWindows()
 
 
