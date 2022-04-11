@@ -21,10 +21,10 @@ Robotic Arm with Vision System, Penn State Behrend ECE
 # Value - Relative Lightness or darkness - 0-255
 
 # Red
-#lowerRed = np.array([160, 0, 0], dtype="uint8")
-#upperRed = np.array([180, 255, 255], dtype="uint8")
-lowerRed = np.array([0, 0, 0], dtype="uint8")
-upperRed = np.array([10, 255, 255], dtype="uint8")
+lowerRed1 = np.array([160, 50, 50], dtype="uint8")
+upperRed1 = np.array([180, 255, 255], dtype="uint8")
+lowerRed2 = np.array([0, 50, 50], dtype="uint8")
+upperRed2 = np.array([10, 255, 255], dtype="uint8")
 
 # Blue
 lowerBlue = np.array([100, 80, 0], dtype="uint8")
@@ -43,7 +43,7 @@ def colorDetectionHSV():
     """
     Function used to detect live video images in HSV format
     """
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     while True:
         for _ in range(100):
             ret, image = cap.read()
@@ -53,8 +53,9 @@ def colorDetectionHSV():
             cv2.imshow("i",image)
 
             # find the colors within the specified boundaries and apply the mask
-            maskR = cv2.inRange(image_HSV, lowerRed, upperRed)  # red
-            #maskR = cv2.inRange(image_HSV, lowerRed2, upperRed2)  # red
+            maskR1 = cv2.inRange(image_HSV, lowerRed1, upperRed1)  # red
+            maskR2 = cv2.inRange(image_HSV, lowerRed2, upperRed2)  # red
+            maskR = cv2.bitwise_or(maskR1, maskR2)
             maskB = cv2.inRange(image_HSV, lowerBlue, upperBlue)  # blue
             maskY = cv2.inRange(image_HSV, lowerYellow, upperYellow)  # yellow
             maskG = cv2.inRange(image_HSV, lowerGreen, upperGreen)  # green
@@ -62,9 +63,10 @@ def colorDetectionHSV():
             # Inverts the mask, does not display the color
             # mask = cv2.bitwise_not(mask)
 
+
             # Applies the masks to the image
             outputR = cv2.bitwise_and(image, image, mask=maskR)
-            #outputR = cv2.bitwise_and(image, outputR, mask=maskR2)
+            #outputR = cv2.bitwise_or(image, outputR, mask=maskR2)
             #outputB = cv2.bitwise_and(image, image, mask=maskB)
             #outputY = cv2.bitwise_and(image, image, mask=maskY)
             #outputG = cv2.bitwise_and(image, image, mask=maskG)
@@ -100,7 +102,7 @@ def cyclePictures():
             image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
             # find the colors within the specified boundaries and apply the mask
-            maskR = cv2.inRange(image_HSV, lowerRed, upperRed)  # red
+            maskR = cv2.inRange(image_HSV, lowerRed1, upperRed1)  # red
             maskB = cv2.inRange(image_HSV, lowerBlue, upperBlue)  # blue
             maskY = cv2.inRange(image_HSV, lowerYellow, upperYellow)  # yellow
             maskG = cv2.inRange(image_HSV, lowerGreen, upperGreen)  # green
@@ -135,7 +137,7 @@ def viewPicture(filename):
     image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # find the colors within the specified boundaries and apply the mask
-    maskR = cv2.inRange(image_HSV, lowerRed, upperRed)  # red
+    maskR = cv2.inRange(image_HSV, lowerRed1, upperRed1)  # red
     maskB = cv2.inRange(image_HSV, lowerBlue, upperBlue)  # blue
     maskY = cv2.inRange(image_HSV, lowerYellow, upperYellow)  # yellow
     maskG = cv2.inRange(image_HSV, lowerGreen, upperGreen)  # green
@@ -248,7 +250,7 @@ def zoom(img, hZoom, wZoom):
 def main():
     colorDetectionHSV()
     # blobDetection()
-    # viewPicture("dobot_9.jpg")
+    #viewPicture("dobot_1.jpg")
     # zoom(cv2.imread(os.path.join("test_pics", "dobot_1.jpg")), 2, 1)
 
 
