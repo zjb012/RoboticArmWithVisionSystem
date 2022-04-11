@@ -25,7 +25,7 @@ lowerRed = np.array([160, 0, 0], dtype="uint8")
 upperRed = np.array([180, 255, 255], dtype="uint8")
 
 # Blue
-lowerBlue = np.array([100, 100, 0], dtype="uint8")
+lowerBlue = np.array([100, 80, 0], dtype="uint8")
 upperBlue = np.array([125, 255, 255], dtype="uint8")
 
 # Yellow
@@ -213,12 +213,12 @@ def drawBoundingBox(img):
     if contours:
         x, y, w, h = cv2.boundingRect(contours[0])
         cv2.rectangle(result, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        print("x,y,w,h:", x, y, w, h)
+        #print("x,y,w,h:", x, y, w, h)
 
     # show thresh and result
     cv2.imshow("bounding_box", thresh)
     cv2.waitKey(1)
-    cv2.waitKey(100)
+    return contours
 
     #cv2.destroyAllWindows()
 
