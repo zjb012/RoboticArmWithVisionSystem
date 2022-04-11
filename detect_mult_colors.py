@@ -21,8 +21,10 @@ Robotic Arm with Vision System, Penn State Behrend ECE
 # Value - Relative Lightness or darkness - 0-255
 
 # Red
-lowerRed = np.array([160, 0, 0], dtype="uint8")
-upperRed = np.array([180, 255, 255], dtype="uint8")
+#lowerRed = np.array([160, 0, 0], dtype="uint8")
+#upperRed = np.array([180, 255, 255], dtype="uint8")
+lowerRed = np.array([0, 0, 0], dtype="uint8")
+upperRed = np.array([10, 255, 255], dtype="uint8")
 
 # Blue
 lowerBlue = np.array([100, 80, 0], dtype="uint8")
@@ -45,12 +47,14 @@ def colorDetectionHSV():
     while True:
         for _ in range(100):
             ret, image = cap.read()
-            image = zoom(image, 1, 1)
+            #image = zoom(image, 1, 1)
 
             image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+            cv2.imshow("i",image)
 
             # find the colors within the specified boundaries and apply the mask
             maskR = cv2.inRange(image_HSV, lowerRed, upperRed)  # red
+            #maskR = cv2.inRange(image_HSV, lowerRed2, upperRed2)  # red
             maskB = cv2.inRange(image_HSV, lowerBlue, upperBlue)  # blue
             maskY = cv2.inRange(image_HSV, lowerYellow, upperYellow)  # yellow
             maskG = cv2.inRange(image_HSV, lowerGreen, upperGreen)  # green
@@ -60,18 +64,19 @@ def colorDetectionHSV():
 
             # Applies the masks to the image
             outputR = cv2.bitwise_and(image, image, mask=maskR)
-            outputB = cv2.bitwise_and(image, image, mask=maskB)
-            outputY = cv2.bitwise_and(image, image, mask=maskY)
-            outputG = cv2.bitwise_and(image, image, mask=maskG)
+            #outputR = cv2.bitwise_and(image, outputR, mask=maskR2)
+            #outputB = cv2.bitwise_and(image, image, mask=maskB)
+            #outputY = cv2.bitwise_and(image, image, mask=maskY)
+            #outputG = cv2.bitwise_and(image, image, mask=maskG)
 
             # shows both images
-            row1 = np.concatenate((outputR, outputB), axis=1)
-            row2 = np.concatenate((outputY, outputG), axis=1)
-            imageStack = np.concatenate((row1, row2), axis=0)
-            # cv2.imshow("images", imageStack)
+            #row1 = np.concatenate((outputR, outputB), axis=1)
+            #row2 = np.concatenate((outputY, outputG), axis=1)
+            #imageStack = np.concatenate((row1, row2), axis=0)
+            cv2.imshow("images", outputR)
 
-            #drawBoundingBox(outputR)
-            drawBoundingBox(outputB)
+            drawBoundingBox(outputR)
+            #drawBoundingBox(outputB)
             #drawBoundingBox(outputY)
             #drawBoundingBox(outputG)
 
@@ -153,10 +158,10 @@ def viewPicture(filename):
     imageStack = np.concatenate((row1, row2), axis=0)
     imageStack = cv2.resize(imageStack, (1500, 900), interpolation=cv2.INTER_LINEAR)
 
-    #drawBoundingBox(outputR)
+    drawBoundingBox(outputR)
     drawBoundingBox(outputB)
-    #drawBoundingBox(outputY)
-    #drawBoundingBox(outputG)
+    drawBoundingBox(outputY)
+    drawBoundingBox(outputG)
 
     #cv2.imshow("images", imageStack)
     cv2.waitKey(0)

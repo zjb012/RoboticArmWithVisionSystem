@@ -1,6 +1,7 @@
 import threading
 import sys
 import DobotDllType as dType
+import time
 
 # Turn Conveyor On
 STEP_PER_CIRCLE = 360.0 / 1.8 * 10.0 * 16.0
@@ -13,12 +14,21 @@ CON_STR = {
     dType.DobotConnect.DobotConnect_NotFound: "DobotConnect_NotFound",
     dType.DobotConnect.DobotConnect_Occupied: "DobotConnect_Occupied"}
 
+
 def conveyorOn(api, velo):
     dType.SetEMotorEx(api, 0, 1, int(velo), 1)
 
 
 def conveyorOff(api):
     dType.SetEMotorEx(api, 0, 1, 0, 1)
+
+
+def suctionON(api):
+    dType.SetEndEffectorSuctionCup(api, 1, 1, isQueued=1)
+
+
+def suctionOFF(api):
+    dType.SetEndEffectorSuctionCup(api, 1, 0, isQueued=1)
 
 
 def movetoCoordinate(api, x, y, z):
@@ -28,6 +38,7 @@ def movetoCoordinate(api, x, y, z):
 def main():
     # Load Dll and get the CDLL object
     api = dType.load()
+
 
     # Connect Dobot
     state = dType.ConnectDobot(api, "", 115200)[0]
