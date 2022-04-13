@@ -14,16 +14,15 @@ Developed by Zack Bowen with assistance from Quinn Geist and Zheng Zeng
 Robotic Arm with Vision System, Penn State Behrend ECE
 """
 
-
 # Colors in HSV
 # Hue - Pure Color - 8 bits 0-180, find Hue value and divide by 2 to get values on scale
 # Saturation - Purity/Intensity - 0-255
 # Value - Relative Lightness or darkness - 0-255
 
 # Red
-lowerRed1 = np.array([160, 50, 50], dtype="uint8")
+lowerRed1 = np.array([160, 0, 0], dtype="uint8")
 upperRed1 = np.array([180, 255, 255], dtype="uint8")
-lowerRed2 = np.array([0, 50, 50], dtype="uint8")
+lowerRed2 = np.array([0, 0, 0], dtype="uint8")
 upperRed2 = np.array([10, 255, 255], dtype="uint8")
 
 # Blue
@@ -43,14 +42,15 @@ def colorDetectionHSV():
     """
     Function used to detect live video images in HSV format
     """
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
     while True:
         for _ in range(100):
             ret, image = cap.read()
-            #image = zoom(image, 1, 1)
+            # image = zoom(image, 1, 1)
 
             image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-            cv2.imshow("i",image)
+            # cv2.imshow("i",image)
 
             # find the colors within the specified boundaries and apply the mask
             maskR1 = cv2.inRange(image_HSV, lowerRed1, upperRed1)  # red
@@ -63,27 +63,25 @@ def colorDetectionHSV():
             # Inverts the mask, does not display the color
             # mask = cv2.bitwise_not(mask)
 
-
             # Applies the masks to the image
             outputR = cv2.bitwise_and(image, image, mask=maskR)
-            #outputR = cv2.bitwise_or(image, outputR, mask=maskR2)
-            #outputB = cv2.bitwise_and(image, image, mask=maskB)
-            #outputY = cv2.bitwise_and(image, image, mask=maskY)
-            #outputG = cv2.bitwise_and(image, image, mask=maskG)
+            # outputB = cv2.bitwise_and(image, image, mask=maskB)
+            # outputY = cv2.bitwise_and(image, image, mask=maskY)
+            # outputG = cv2.bitwise_and(image, image, mask=maskG)
 
             # shows both images
-            #row1 = np.concatenate((outputR, outputB), axis=1)
-            #row2 = np.concatenate((outputY, outputG), axis=1)
-            #imageStack = np.concatenate((row1, row2), axis=0)
-            cv2.imshow("images", outputR)
+            # row1 = np.concatenate((outputR, outputB), axis=1)
+            # row2 = np.concatenate((outputY, outputG), axis=1)
+            # imageStack = np.concatenate((row1, row2), axis=0)
+            # cv2.imshow("images", outputR)
 
             drawBoundingBox(outputR)
-            #drawBoundingBox(outputB)
-            #drawBoundingBox(outputY)
-            #drawBoundingBox(outputG)
+            # drawBoundingBox(outputB)
+            # drawBoundingBox(outputY)
+            # drawBoundingBox(outputG)
 
-            #drawBoundingBox(imageStack)
-            #sys.exit(1)
+            # drawBoundingBox(imageStack)
+            # sys.exit(1)
             # Press q to quit
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 sys.exit(1)
@@ -98,7 +96,7 @@ def cyclePictures():
         for _ in range(100):
 
             image = cv2.imread(os.path.join("test_pics", filename))
-            image = cv2.resize(image, (300,300), interpolation=cv2.INTER_LINEAR)
+            image = cv2.resize(image, (300, 300), interpolation=cv2.INTER_LINEAR)
             image_HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
             # find the colors within the specified boundaries and apply the mask
@@ -120,7 +118,7 @@ def cyclePictures():
             row1 = np.concatenate((outputR, outputB, image), axis=1)
             row2 = np.concatenate((outputY, outputG, image), axis=1)
             imageStack = np.concatenate((row1, row2), axis=0)
-            cv2.imshow("images", imageStack)
+            # cv2.imshow("images", imageStack)
 
             # Press q to quit
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -165,8 +163,8 @@ def viewPicture(filename):
     drawBoundingBox(outputY)
     drawBoundingBox(outputG)
 
-    #cv2.imshow("images", imageStack)
-    cv2.waitKey(0)
+    # cv2.imshow("images", imageStack)
+    # cv2.waitKey(0)
 
     # Press q to quit
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -180,10 +178,9 @@ def drawBoundingBox(img):
     Returns the position of the bounding box as a tuple of x,y,w,h
     """
 
-
     # convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #cv2.imwrite("gray.jpg", gray)
+    # cv2.imwrite("gray.jpg", gray)
 
     #  _____________________________________________________________________
     # Eventually want to update based on what the image looks like (change number of iterations)
@@ -198,20 +195,18 @@ def drawBoundingBox(img):
     # gray = cv2.erode(gray, kernel, iterations=5)
     #  _____________________________________________________________________
 
-
     smoothed = cv2.GaussianBlur(gray, (0, 0), sigmaX=10, sigmaY=10, borderType=cv2.BORDER_DEFAULT)
-    #cv2.imshow("Smoothed", smoothed)
-    #cv2.imwrite("smoothed.jpg", smoothed)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
+    # cv2.imshow("Smoothed", smoothed)
+    # cv2.imwrite("smoothed.jpg", smoothed)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     # threshold
     thresh = cv2.threshold(smoothed, 128, 255, cv2.THRESH_BINARY)[1]
-    #cv2.imshow("Threshold", thresh)
-    #cv2.imwrite("thresh.jpg", thresh)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
-
+    # cv2.imshow("Threshold", thresh)
+    # cv2.imwrite("thresh.jpg", thresh)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     # finds all contours and appends them to array contours
     result = img.copy()
@@ -219,15 +214,18 @@ def drawBoundingBox(img):
     contours = contours[0] if len(contours) == 2 else contours[1]
     if contours:
         x, y, w, h = cv2.boundingRect(contours[0])
-        cv2.rectangle(result, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        #print("x,y,w,h:", x, y, w, h)
+        # cv2.rectangle(result, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        # print("x,y,w,h:", x, y, w, h)
+        if w > 60 or h > 60 or w < 10 or h < 10:
+            contours = ()
+    # print(contours)
 
     # show thresh and result
-    cv2.imshow("bounding_box", thresh)
-    cv2.waitKey(1)
+    # cv2.imshow("bounding_box", thresh)
+    # cv2.waitKey(1)
     return contours
 
-    #cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
 
 
 def zoom(img, hZoom, wZoom):
@@ -244,20 +242,19 @@ def zoom(img, hZoom, wZoom):
     new_h = center[0] / hZoom
     new_w = center[1] / wZoom
 
-    return img[int(center[0]-new_h):int(center[0]+new_h), int(center[1]-new_w):int(center[1]+new_w)]
+    return img[int(center[0] - new_h):int(center[0] + new_h), int(center[1] - new_w):int(center[1] + new_w)]
 
 
 def main():
     colorDetectionHSV()
     # blobDetection()
-    #viewPicture("dobot_1.jpg")
+    # viewPicture("dobot_9.jpg")
     # zoom(cv2.imread(os.path.join("test_pics", "dobot_1.jpg")), 2, 1)
 
 
 if __name__ == "__main__":
     sys.exit(main())
 
-
 # Ideas to get correct bounding box:
-    # Remove glare (yellow blends with white)
-    # Zoom image to just the conveyor
+# Remove glare (yellow blends with white)
+# Zoom image to just the conveyor
